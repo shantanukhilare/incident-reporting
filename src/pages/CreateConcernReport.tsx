@@ -7,9 +7,9 @@ import { toast } from "react-toastify";
 interface ConcernFormData {
   siteName: string;
   name: string;
-  category: number;
+  category: string;
   dateOfIdentification: string;
-  severity: number;
+  severity: string;
   observationDetails: string;
   location: string;
   actionTaken: string;
