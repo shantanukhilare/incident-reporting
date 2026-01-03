@@ -1,15 +1,15 @@
 import React from 'react';
 
 interface DropdownOption {
-  value: string | number;
+  value: string;
   label: string;
 }
 
 interface DropdownProps {
   label?: string;
   options: DropdownOption[];
-  value?: string | number;
-  onChange?: (value: string | number) => void;
+  value?: string;
+  onChange?: (value: string) => void;
   className?: string;
   required?: boolean;
   placeholder?: string;
