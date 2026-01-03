@@ -17,11 +17,11 @@ function FormPage() {
     });
 
     const countryOptions = [
-        { value: 0, label: "United States" },
-        { value: 1, label: "United Kingdom" },
-        { value: 2, label: "Canada" },
-        { value: 3, label: "Australia" },
-        { value: 4, label: "Germany" },
+        { value: "0", label: "United States" },
+        { value: "1", label: "United Kingdom" },
+        { value: "2", label: "Canada" },
+        { value: "3", label: "Australia" },
+        { value: "4", label: "Germany" },
     ];
 
     const genderOptions = [

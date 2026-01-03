@@ -46,9 +46,9 @@ export default function CreateConcernReport() {
   const initialFormData: ConcernFormData = {
     siteName: "",
     name: "",
-    category: 0,
+    category: "",
     dateOfIdentification: "",
-    severity: 0,
+    severity: "",
     observationDetails: "",
     location: "",
     actionTaken: "",
