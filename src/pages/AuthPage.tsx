@@ -182,7 +182,7 @@ function AuthPage() {
 
     return (
         <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
-            <h2 className="text-3xl font-bold mb-8 text-[#254C5A]">User Authentication</h2>
+            <h2 className="text-3xl font-bold mb-8 text-secondary">User Authentication</h2>
             
             <form onSubmit={onSubmit} className="space-y-0">
                 {/* Email with Send OTP Button */}
@@ -286,7 +286,7 @@ function AuthPage() {
                                         className="w-4 h-4 text-[#8bbb04] focus:ring-[#8bbb04] focus:ring-2 accent-[#8bbb04]"
                                         required
                                     />
-                                    <span className="text-sm text-gray-700 group-hover:text-[#254C5A] transition-colors">{option.label}</span>
+                                    <span className="text-sm text-gray-700 group-hover:text-secondary transition-colors">{option.label}</span>
                                 </label>
                             ))}
                         </div>

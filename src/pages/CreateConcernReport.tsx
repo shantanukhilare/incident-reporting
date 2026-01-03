@@ -3,8 +3,9 @@ import Dropdown from "../components/Dropdown";
 import DatePicker from "../components/DatePicker";
 import Button from "../components/Button";
 import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 
-interface ConcernFormData {
+export interface ConcernFormData {
   siteName: string;
   name: string;
   category: string;
@@ -73,6 +74,15 @@ export default function CreateConcernReport() {
     setErrors({});
   };
 
+  const navigate=useNavigate();
+
+  const onClear = () => {
+    setFormData(initialFormData);
+    setErrors({});
+    navigate("/form");
+    
+  };
+
   const categoryOptions = [
     { value: "1", label: "Category 1" },
     { value: "2", label: "Category 2" },
@@ -98,9 +108,12 @@ export default function CreateConcernReport() {
 
   return (
     <div className="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg">
-      <h2 className="text-3xl font-bold mb-8 text-[#254C5A]">
+      <div className="flex justify-between items-center">
+        <h2 className="text-3xl font-bold mb-8 text-secondary">
         Create Concern Report
       </h2>
+      <Link to="/auth" className="teqo-button">Authenticate</Link>
+      </div>
       <form className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
         <div className="form-row">
           <label className="form-label">
@@ -279,6 +292,11 @@ export default function CreateConcernReport() {
         onClick={onSubmit}
         label="Submit"
         className="mt-4 teqo-button"
+      ></Button>
+      <Button
+        onClick={onClear}
+        label="Clear"
+        className="mt-4 teqo-button-secondary ml-4"
       ></Button>
     </div>
   );

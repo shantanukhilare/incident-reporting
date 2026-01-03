@@ -7,9 +7,10 @@ const AppRoutes = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<FormPage />} />
+        <Route path="/form" element={<FormPage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/concern-report" element={<CreateConcernReport />} />
+        <Route path="/" element={<CreateConcernReport />} />
       </Routes>
     </BrowserRouter>
   );
