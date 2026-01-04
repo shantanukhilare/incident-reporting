@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { toast } from "react-toastify";
 import Button from "../components/Button";
 import Dropdown from "../components/Dropdown";
+import { useNavigate } from "react-router-dom";
 
 function AuthPage() {
     const [formData, setFormData] = useState({
@@ -17,6 +18,7 @@ function AuthPage() {
         siteMember: "",
         type: "",
     });
+    const nav = useNavigate();
 
     
 
@@ -190,7 +192,7 @@ function AuthPage() {
                     <label className="form-label">
                         Enter Email <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex-1 flex flex-col gap-1">
+                    <div className="flex-1 flex flex-col gap-1 w-full">
                         <div className="flex gap-3">
                             <input
                                 type="email"
@@ -233,7 +235,7 @@ function AuthPage() {
                                 <span className="text-xs text-gray-500 ml-2">(Expires in {formatTime(timer)})</span>
                             )}
                         </label>
-                        <div className="flex-1 flex flex-col gap-1">
+                        <div className="flex-1 flex flex-col gap-1 w-full">
                             <input
                                 type="text"
                                 value={formData.otp}
@@ -308,6 +310,14 @@ function AuthPage() {
                     >
                         Submit
                     </button>
+                    <Button
+                        label="Already Logged In"
+                        className="teqo-button-secondary ml-4"
+                        onClick={() => {
+                            nav("/");
+                        }}
+                    >
+                    </Button>
                 </div>
             </form>
         </div>
