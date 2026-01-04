@@ -8,9 +8,9 @@ import { Link, useNavigate } from "react-router-dom";
 export interface ConcernFormData {
   siteName: string;
   name: string;
-  category: string;
+  category: number;
   dateOfIdentification: string;
-  severity: string;
+  severity: number;
   observationDetails: string;
   location: string;
   actionTaken: string;
@@ -47,9 +47,9 @@ export default function CreateConcernReport() {
   const initialFormData: ConcernFormData = {
     siteName: "",
     name: "",
-    category: "",
+    category: 0,
     dateOfIdentification: "",
-    severity: "",
+    severity: 0,
     observationDetails: "",
     location: "",
     actionTaken: "",
@@ -84,18 +84,18 @@ export default function CreateConcernReport() {
   };
 
   const categoryOptions = [
-    { value: "1", label: "Category 1" },
-    { value: "2", label: "Category 2" },
-    { value: "3", label: "Category 3" },
-    { value: "4", label: "Category 4" },
-    { value: "5", label: "Category 5" },
+    { value: 1, label: "Category 1" },
+    { value: 2, label: "Category 2" },
+    { value: 3, label: "Category 3" },
+    { value: 4, label: "Category 4" },
+    { value: 5, label: "Category 5" },
   ];
 
   const severityOptions = [
-    { value: "1", label: "Low" },
-    { value: "2", label: "Medium" },
-    { value: "3", label: "High" },
-    { value: "4", label: "Critical" },
+    { value: 1, label: "Low" },
+    { value: 2, label: "Medium" },
+    { value: 3, label: "High" },
+    { value: 4, label: "Critical" },
   ];
 
   const handleInputChange = (
@@ -112,9 +112,8 @@ export default function CreateConcernReport() {
         <h2 className="text-3xl font-bold mb-8 text-secondary">
         Create Concern Report
       </h2>
-      <Link to="/auth" className="teqo-button">Authenticate</Link>
       </div>
-      <form className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      <form className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-4">
         <div className="form-row">
           <label className="form-label">
             Site Name <span className="text-red-500">*</span>
@@ -288,16 +287,23 @@ export default function CreateConcernReport() {
           />
         </div>
       </form>
-      <Button
-        onClick={onSubmit}
-        label="Submit"
-        className="mt-4 teqo-button"
-      ></Button>
-      <Button
-        onClick={onClear}
-        label="Clear"
-        className="mt-4 teqo-button-secondary ml-4"
-      ></Button>
+      <div className="flex justify-center items-center">
+        <span>Not signed in?</span>
+          <Link to="/auth" className="text-blue-700 underline">Authenticate Email</Link>
+      </div>
+      <div className="flex items-center justify-center">
+        <Button
+          onClick={onSubmit}
+          label="Submit"
+          className="mt-4 teqo-button-secondary"
+          ></Button>
+        <Button
+          onClick={onClear}
+          label="Clear"
+          className="mt-4 teqo-button ml-4"
+          ></Button>
+        </div>
+
     </div>
   );
 }

@@ -1,4 +1,6 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+
 
 @theme {
   --color-teqo: #8bbb04;
@@ -8,213 +10,18 @@
   --color-secondary-hover: #1a3a47;
 }
 
-.teqo-button {
-  background-color: var(--color-teqo);
-  color: white;
-  font-weight: bold;
-  padding: 0.625rem 1.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(139, 187, 4, 0.2);
+body {
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+               'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+               'Helvetica Neue', Arial, sans-serif;
+  background-color: beige;
 }
 
-.teqo-button:hover {
-  background-color: var(--color-teqo-hover);
-  cursor: pointer;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(139, 187, 4, 0.3);
-}
 
-.teqo-button-secondary {
-  background-color: var(--color-secondary);
-  color: white;
-  font-weight: bold;
-  padding: 0.625rem 1.5rem;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(37, 76, 90, 0.2);
-}
-
-.teqo-button-secondary:hover {
-  background-color: var(--color-secondary-hover);
-  cursor: pointer;
-  transform: translateY(-1px);
-  box-shadow: 0 4px 8px rgba(37, 76, 90, 0.3);
-}
-
-.form-input {
-  padding: 0.75rem 1rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  background-color: white;
-  font-size: 0.875rem;
-  width: 100%;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(139, 187, 4, 0.1);
-}
-
-.form-input:hover:not(:disabled) {
-  border-color: #d1d5db;
-}
-
-.form-input:disabled {
-  background-color: #f3f4f6;
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-.form-select {
-  padding: 0.75rem 1rem;
-  padding-right: 2.5rem;
-  border: 2px solid #e5e7eb;
-  border-radius: 0.5rem;
-  transition: all 0.3s ease;
-  background-color: white;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23254C5A' d='M6 9L1 4h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 0.75rem center;
-  background-size: 1rem;
-  font-size: 0.875rem;
-  cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  color: #1f2937 !important;
-  font-weight: 500;
-  width: 100%;
-}
-
-.form-select:focus {
-  outline: none;
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(139, 187, 4, 0.1);
-  background-color: #f9fafb;
-}
-
-.form-select:hover {
-  border-color: var(--color-primary);
-  background-color: #f9fafb;
-}
-
-.form-select option {
-  padding: 0.75rem 1rem;
-  background-color: white;
-  color: #1f2937 !important;
-  font-weight: 500;
-}
-
-.form-select option:hover,
-.form-select option:focus {
-  background-color: rgba(139, 187, 4, 0.2) !important;
-  color: #1f2937 !important;
-}
-
-.form-select option:checked {
-  background-color: rgba(139, 187, 4, 0.15) !important;
-  color: #1f2937 !important;
-  font-weight: 600;
-}
-
-.form-select option:active {
-  background-color: rgba(139, 187, 4, 0.25) !important;
-}
-
-.form-label {
-  font-weight: 600;
-  color: var(--color-secondary);
-  font-size: 0.875rem;
-  min-width: 180px;
-  display: flex;
-  align-items: center;
-}
-
-.form-row {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  flex-wrap: wrap;
-  align-items: start;
-  gap: 1.5rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.form-row:last-child {
-  border-bottom: none;
-}
-
-.file-upload-button {
-  padding: 0.75rem 1.5rem;
-  border: 2px dashed #d1d5db;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: #f9fafb;
-  text-align: center;
-  font-size: 0.875rem;
-  color: var(--color-secondary);
-  font-weight: 500;
-}
-
-.file-upload-button:hover {
-  border-color: var(--color-primary);
-  background-color: rgba(139, 187, 4, 0.05);
-  border-style: solid;
-}
-
-/* Toastify Custom Theme */
-.Toastify__toast {
-  border-radius: 0.5rem;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.Toastify__toast--success {
-  background-color: var(--color-primary);
-  color: white;
-}
-
-.Toastify__toast--error {
-  background-color: #ef4444;
-  color: white;
-}
-
-.Toastify__toast--info {
-  background-color: var(--color-secondary);
-  color: white;
-}
-
-.Toastify__toast--warning {
-  background-color: #f59e0b;
-  color: white;
-}
-
-.Toastify__progress-bar--success {
-  background: rgba(255, 255, 255, 0.6);
-}
-
-.Toastify__progress-bar--error {
-  background: rgba(255, 255, 255, 0.6);
-}
-
-.Toastify__progress-bar--info {
-  background: rgba(255, 255, 255, 0.6);
-}
-
-.Toastify__progress-bar--warning {
-  background: rgba(255, 255, 255, 0.6);
-}
-
-.Toastify__close-button {
-  color: white;
-  opacity: 0.8;
-}
-
-.Toastify__close-button:hover {
-  opacity: 1;
+#root {
+  /* display: flex;
+  flex-direction: column; */
+  /* min-height: 100vh;
+   */
+   padding: 1rem;
 }

@@ -8,8 +8,8 @@ function AuthPage() {
     const [formData, setFormData] = useState({
         email: "",
         otp: "",
-        siteMember: "",
-        type: "",
+        siteMember: 0,
+        type: 0,
     });
 
     const [errors, setErrors] = useState({
@@ -28,14 +28,14 @@ function AuthPage() {
     const timerIntervalRef = useRef<number | null>(null);
 
     const siteMemberOptions = [
-        { value: "site-member", label: "Site Member" },
-        { value: "visitor", label: "Visitor" },
-        { value: "site-incharge", label: "Site Incharge" },
+        { value: 1, label: "Site Member" },
+        { value: 2, label: "Visitor" },
+        { value: 3, label: "Site Incharge" },
     ];
 
     const typeOptions = [
-        { value: "concern-report", label: "Concern Report" },
-        { value: "incident", label: "Incident" },
+        { value: 1, label: "Concern Report" },
+        { value: 2, label: "Incident" },
     ];
 
     // Timer effect
@@ -74,7 +74,7 @@ function AuthPage() {
         return `${mins}:${secs.toString().padStart(2, '0')}`;
     };
 
-    const handleInputChange = (field: string, value: string) => {
+    const handleInputChange = (field: string, value: string|number|File|null) => {
         setFormData(prev => ({ ...prev, [field]: value }));
         // Clear error when user starts typing
         if (errors[field as keyof typeof errors]) {
@@ -162,14 +162,14 @@ function AuthPage() {
         }
 
         console.log("Auth Form Data:", formData);
-        toast.success("Form submitted successfully!");
+        toast.success("Authentication successfully!");
         
         // Reset form after successful submission
         setFormData({
             email: "",
             otp: "",
-            siteMember: "",
-            type: "",
+            siteMember: 0,
+            type: 0,
         });
         setErrors({
             email: "",
@@ -180,6 +180,7 @@ function AuthPage() {
         setOtpSent(false);
         setTimer(0);
         setIsResendDisabled(false);
+        nav("/concern-report");
     };
 
     return (
@@ -216,7 +217,7 @@ function AuthPage() {
                                 <Button
                                     onClick={handleSendOTP}
                                     label="Send OTP"
-                                    className="teqo-button whitespace-nowrap"
+                                    className="teqo-button-secondary whitespace-nowrap"
                                 />
                             )}
                         </div>

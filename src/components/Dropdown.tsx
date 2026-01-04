@@ -1,15 +1,15 @@
 import React from 'react';
 
 interface DropdownOption {
-  value: string;
+  value: number;
   label: string;
 }
 
 interface DropdownProps {
   label?: string;
   options: DropdownOption[];
-  value?: string;
-  onChange?: (value: string) => void;
+  value?: number;
+  onChange?: (value: number) => void;
   className?: string;
   required?: boolean;
   placeholder?: string;
@@ -36,8 +36,8 @@ const Dropdown: React.FC<DropdownProps> = ({
       )}
       <div className="flex-1 flex flex-col gap-1 w-full">
         <select
-          value={value || ''}
-          onChange={(e) => onChange?.(e.target.value)}
+          value={value || 0}
+          onChange={(e) => onChange?.(parseInt(e.target.value))}
           className={`form-select flex-1 ${error ? 'border-red-500' : ''} ${className}`}
           required={required}
         >
@@ -59,4 +59,3 @@ const Dropdown: React.FC<DropdownProps> = ({
 };
 
 export default Dropdown;
-
