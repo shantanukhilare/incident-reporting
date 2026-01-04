@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface RadioOption {
-  value: string;
+  value: number;
   label: string;
 }
 
@@ -9,7 +9,7 @@ interface RadioButtonProps {
   label?: string;
   name: string;
   options: RadioOption[];
-  value?: string;
+  value?: number;
   onChange?: (value: string) => void;
   className?: string;
   required?: boolean;

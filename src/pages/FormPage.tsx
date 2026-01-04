@@ -10,35 +10,35 @@ function FormPage() {
         fullName: "",
         email: "",
         birthDate: "",
-        country: "",
-        gender: "",
-        experience: "",
+        country: 0,
+        gender: 0,
+        experience: 0,
         resume: null as FileList | null,
     });
 
     const countryOptions = [
-        { value: "0", label: "United States" },
-        { value: "1", label: "United Kingdom" },
-        { value: "2", label: "Canada" },
-        { value: "3", label: "Australia" },
-        { value: "4", label: "Germany" },
+        { value: 1, label: "United States" },
+        { value: 2, label: "United Kingdom" },
+        { value: 3, label: "Canada" },
+        { value: 4, label: "Australia" },
+        { value: 5, label: "Germany" },
     ];
 
     const genderOptions = [
-        { value: "male", label: "Male" },
-        { value: "female", label: "Female" },
-        { value: "other", label: "Other" },
-        { value: "prefer-not-to-say", label: "Prefer not to say" },
+        { value: 1, label: "Male" },
+        { value: 2, label: "Female" },
+        { value: 3, label: "Other" },
+        { value: 4, label: "Prefer not to say" },
     ];
 
     const experienceOptions = [
-        { value: "beginner", label: "Beginner (0-2 years)" },
-        { value: "intermediate", label: "Intermediate (3-5 years)" },
-        { value: "advanced", label: "Advanced (6-10 years)" },
-        { value: "expert", label: "Expert (10+ years)" },
+        { value: 1, label: "Beginner (0-2 years)" },
+        { value: 2, label: "Intermediate (3-5 years)" },
+        { value: 3, label: "Advanced (6-10 years)" },
+        { value: 4, label: "Expert (10+ years)" },
     ];
 
-    const handleInputChange = (field: string, value: string) => {
+    const handleInputChange = (field: string, value: string|number|File | null) => {
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
@@ -57,9 +57,9 @@ function FormPage() {
             fullName: "",
             email: "",
             birthDate: "",
-            country: "",
-            gender: "",
-            experience: "",
+            country: 0,
+            gender: 0,
+            experience: 0,
             resume: null,
         });
     };
