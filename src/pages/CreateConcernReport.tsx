@@ -3,7 +3,7 @@ import Dropdown from "../components/Dropdown";
 import DatePicker from "../components/DatePicker";
 import Button from "../components/Button";
 import { toast } from "react-toastify";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import PhotoUpload from "../components/PhotoUpload";
 
 export interface ConcernFormData {
@@ -75,13 +75,9 @@ export default function CreateConcernReport() {
     setErrors({});
   };
 
-  const navigate=useNavigate();
-
   const onClear = () => {
     setFormData(initialFormData);
-    setErrors({});
-    navigate("/form");
-    
+    setErrors({});    
   };
 
   const categoryOptions = [

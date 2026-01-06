@@ -226,11 +226,6 @@ export default function AuthPage() {
               <div className="form-row">
                 <label className="form-label">
                   Enter OTP <span className="text-red-500">*</span>
-                  {/* {timer > 0 && (
-                    <span className="text-xs text-gray-500 ml-2">
-                      (Expires in {formatTime(timer)})
-                    </span>
-                  )} */}
                 </label>
 
                 <div className="flex-1 flex flex-col gap-1 w-full">
