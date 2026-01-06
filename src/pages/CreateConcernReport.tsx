@@ -4,6 +4,7 @@ import DatePicker from "../components/DatePicker";
 import Button from "../components/Button";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
+import PhotoUpload from "../components/PhotoUpload";
 
 export interface ConcernFormData {
   siteName: string;
@@ -19,7 +20,7 @@ export interface ConcernFormData {
   targetClosureDate: string;
   actualClosureDate: string;
   numberOfDays: number;
-  attachment: File | null;
+  attachment: FileList | null;
   photo: File | null;
   remarks: string;
 }
@@ -100,7 +101,7 @@ export default function CreateConcernReport() {
 
   const handleInputChange = (
     field: keyof ConcernFormData,
-    value: string | number | File | null
+    value: string | number | File | FileList | null
   ) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
     setErrors((prev) => ({ ...prev, [field]: "" }));
@@ -120,16 +121,17 @@ export default function CreateConcernReport() {
           </label>
           <input
             type="text"
-            value={formData.siteName}
-            onChange={(e) => handleInputChange("siteName", e.target.value)}
-            className={`form-input flex-1 ${
+            // value={formData.siteName}
+            value="Enfinity_20_TS_IN"
+            readOnly
+            className={`form-input flex-1 cursor-not-allowed bg-slate-200 ${
               errors.siteName ? "border-red-500" : ""
             }`}
             required
             placeholder="Enter Site Name"
           />
         </div>
-        <div className="form-row">
+        {/* <div className="form-row">
           <label className="form-label">
             Name <span className="text-red-500">*</span>
           </label>
@@ -143,7 +145,8 @@ export default function CreateConcernReport() {
             required
             placeholder="Enter Full Name"
           />
-        </div>
+        </div> */}
+
         <Dropdown
           label="Category"
           options={categoryOptions}
@@ -286,6 +289,14 @@ export default function CreateConcernReport() {
             placeholder="Enter Remarks"
           />
         </div>
+        <PhotoUpload
+          label="Upload Photos/Videos"
+          value={formData.attachment}
+          onChange={(newFiles) => setFormData({...formData, attachment: newFiles})}
+          multiple
+          required
+        />
+        
       </form>
       <div className="flex justify-center items-center">
         <span>Not signed in?</span>

@@ -3,7 +3,7 @@ import Button from "../components/Button";
 import DatePicker from "../components/DatePicker";
 import Dropdown from "../components/Dropdown";
 import RadioButton from "../components/RadioButton";
-import PhotoVideoUpload from "../components/PhotoVideoUpload";
+import PhotoVideoUpload from "../components/PhotoUpload";
 
 function FormPage() {
     const [formData, setFormData] = useState({
