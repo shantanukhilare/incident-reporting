@@ -92,18 +92,17 @@
   background-color: #f9fafb;
 }
 
-.form-select option {
+ .form-select option {
   padding: 0.75rem 1rem;
   background-color: white;
-  color: #1f2937 !important;
+  color: primary !important;
   font-weight: 500;
 }
-
 .form-select option:hover,
 .form-select option:focus {
   background-color: rgba(139, 187, 4, 0.2) !important;
   color: #1f2937 !important;
-}
+  }
 
 .form-select option:checked {
   background-color: rgba(139, 187, 4, 0.15) !important;
@@ -113,6 +112,10 @@
 
 .form-select option:active {
   background-color: rgba(139, 187, 4, 0.25) !important;
+} 
+
+.form-select option:hover {
+  background-color: rgba(139, 187, 4, 0.1) !important;
 }
 
 .form-label {

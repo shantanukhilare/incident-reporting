@@ -44,7 +44,7 @@ const RadioButton: React.FC<RadioButtonProps> = ({
               className="w-4 h-4 text-[#8bbb04] focus:ring-[#8bbb04] focus:ring-2 accent-[#8bbb04]"
               required={required}
             />
-            <span className="text-sm text-gray-700 group-hover:text-[#254C5A] transition-colors">{option.label}</span>
+            <span className="text-sm text-gray-700 group-hover:text-secondary transition-colors">{option.label}</span>
           </label>
         ))}
       </div>

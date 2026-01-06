@@ -36,12 +36,12 @@ const Dropdown: React.FC<DropdownProps> = ({
       )}
       <div className="flex-1 flex flex-col gap-1 w-full">
         <select
-          value={value || 0}
+          value={value === 0 ? "" : value} // ← Fixed: empty string when value is 0
           onChange={(e) => onChange?.(parseInt(e.target.value))}
           className={`form-select flex-1 ${error ? 'border-red-500' : ''} ${className}`}
           required={required}
         >
-          <option value="" disabled hidden style={{ color: '#9ca3af', fontStyle: 'italic' }}>
+          <option value="" disabled style={{ color: '#9ca3af', fontStyle: 'italic' }}>
             {placeholder}
           </option>
           {options.map((option) => (
