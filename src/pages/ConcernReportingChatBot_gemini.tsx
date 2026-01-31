@@ -55,14 +55,20 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
   }, [messages, currentStep]);
 
   // Speech Recognition Result Handler
-  const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
-    setInputDescription(prev => {
-      const base = preSpeechValue ? preSpeechValue.trim() + ' ' : '';
-      const newVal = base + transcript;
-      if (isFinal) setPreSpeechValue(newVal);
-      return newVal;
-    });
-  }, [preSpeechValue]);
+const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
+  // Use _prev to tell TS "I know this exists but I'm ignoring it" 
+  // OR use it to build the string safely.
+  setInputDescription(_prev => {
+    const base = preSpeechValue ? preSpeechValue.trim() + ' ' : '';
+    const newVal = base + transcript;
+    
+    // Note: Side effects like setPreSpeechValue inside a setter 
+    // are generally discouraged, but work for simple flags.
+    if (isFinal) setPreSpeechValue(newVal);
+    
+    return newVal;
+  });
+}, [preSpeechValue]);
 
   const { isListening, startListening, stopListening, error: speechError } = useSpeechRecognition(onSpeechResult);
 

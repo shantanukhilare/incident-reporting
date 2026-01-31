@@ -6,10 +6,23 @@ export interface SpeechRecognitionError {
   message: string;
 }
 
+// Define the interface for the Web Speech API
+interface SpeechRecognition extends EventTarget {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onstart: () => void;
+  onend: () => void;
+  onerror: (event: any) => void;
+  onresult: (event: any) => void;
+}
+
 export const useSpeechRecognition = (onResult: (transcript: string, isFinal: boolean) => void) => {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<SpeechRecognitionError | null>(null);
-  const recognitionRef = useRef(null);
+  const recognitionRef = useRef<SpeechRecognition | null>(null);
 
   useEffect(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
