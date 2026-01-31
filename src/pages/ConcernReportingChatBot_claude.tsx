@@ -15,7 +15,7 @@ interface UploadedImage {
   file: File;
 }
 
-const ConcernReportingChatbot: React.FC = () => {
+const ConcernReportingChatBot_claude: React.FC = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: 1,
@@ -744,4 +744,4 @@ const ConcernReportingChatbot: React.FC = () => {
   );
 };
 
-export default ConcernReportingChatbot;
+export default ConcernReportingChatBot_claude;
