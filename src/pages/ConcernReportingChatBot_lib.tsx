@@ -49,8 +49,12 @@ const ConcernReportingChatBot_lib: React.FC = () => {
     isMicrophoneAvailable,
   } = useSpeechRecognition();
 
-  // Combine manual input with transcript
-  const currentDescription = description || transcript;
+  // Update description when transcript changes
+  useEffect(() => {
+    if (transcript) {
+      setDescription(transcript);
+    }
+  }, [transcript]);
 
   // Auto scroll to bottom
   useEffect(() => {
@@ -113,14 +117,13 @@ const ConcernReportingChatBot_lib: React.FC = () => {
   };
 
   const handleSubmitDescription = () => {
-    const finalDescription = currentDescription.trim();
-    if (!finalDescription) return;
+    if (!description.trim()) return;
 
-    setSavedDescription(finalDescription);
+    setSavedDescription(description);
 
     const userMessage: Message = {
       id: messages.length + 1,
-      text: finalDescription,
+      text: description,
       sender: "user",
     };
 
@@ -269,7 +272,7 @@ const ConcernReportingChatBot_lib: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-linear-to-br from-teal-50 to-green-50 overflow-hidden">
+    <div className="fixed inset-0 w-full h-full bg-gradient-to-br from-teal-50 to-green-50 overflow-hidden">
       <div className="w-full h-full flex flex-col bg-white md:max-w-4xl md:mx-auto md:my-0 md:h-full lg:max-w-5xl xl:max-w-6xl md:shadow-2xl">
         {/* Header - Fixed */}
         <div
@@ -425,7 +428,7 @@ const ConcernReportingChatBot_lib: React.FC = () => {
             <div className="flex gap-2">
               <div className="flex-1 relative">
                 <textarea
-                  value={currentDescription}
+                  value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   placeholder="Type your description here or use voice input..."
                   className="w-full px-3 md:px-4 py-2 md:py-3 border-2 border-gray-300 rounded-xl focus:outline-none resize-none focus:border-[#8bbb04] outline-none text-sm md:text-base"
@@ -485,16 +488,16 @@ const ConcernReportingChatBot_lib: React.FC = () => {
               </button>
               <button
                 onClick={handleSubmitDescription}
-                disabled={!currentDescription.trim()}
+                disabled={!description.trim()}
                 className="flex-1 flex items-center justify-center gap-2 text-white px-4 md:px-6 py-2 md:py-2.5 rounded-xl transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm md:text-base active:scale-95"
                 style={{ backgroundColor: "#8bbb04" }}
                 onMouseEnter={(e) => {
-                  if (currentDescription.trim()) {
+                  if (description.trim()) {
                     e.currentTarget.style.backgroundColor = "#7aa603";
                   }
                 }}
                 onMouseLeave={(e) => {
-                  if (currentDescription.trim()) {
+                  if (description.trim()) {
                     e.currentTarget.style.backgroundColor = "#8bbb04";
                   }
                 }}
