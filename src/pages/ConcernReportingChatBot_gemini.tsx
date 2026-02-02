@@ -23,11 +23,11 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
   // State
   const [messages, setMessages] = useState<Message[]>([
     {
-        id: 'initial-message',
-        sender: 'bot',
-        text: "Hello! I'm your Safety Assistant. I'll help you report a concern efficiently. What type of incident are you reporting?",
-        timestamp: new Date(),
-        isActionable: false
+      id: 'initial-message',
+      sender: 'bot',
+      text: "Hello! I'm your Safety Assistant. I'll help you report a concern efficiently. What type of incident are you reporting?",
+      timestamp: new Date(),
+      isActionable: false
     }
   ]);
   const [currentStep, setCurrentStep] = useState<Step>(Step.TypeSelection);
@@ -42,7 +42,10 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
   });
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [inputDescription, setInputDescription] = useState('');
-  const [preSpeechValue, setPreSpeechValue] = useState('');
+  
+  // Buffers for speech to prevent jumping text
+  const baseTextRef = useRef('');
+  const interimTextRef = useRef('');
 
   // Refs
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -55,28 +58,33 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
   }, [messages, currentStep]);
 
   // Speech Recognition Result Handler
-const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
-  // Use _prev to tell TS "I know this exists but I'm ignoring it" 
-  // OR use it to build the string safely.
-  setInputDescription(_prev => {
-    const base = preSpeechValue ? preSpeechValue.trim() + ' ' : '';
-    const newVal = base + transcript;
-    
-    // Note: Side effects like setPreSpeechValue inside a setter 
-    // are generally discouraged, but work for simple flags.
-    if (isFinal) setPreSpeechValue(newVal);
-    
-    return newVal;
-  });
-}, [preSpeechValue]);
+  const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
+    if (isFinal) {
+      // Append finalized text to the base buffer and clear interim
+      const updatedBase = (baseTextRef.current.trim() + ' ' + transcript.trim()).trim();
+      baseTextRef.current = updatedBase;
+      interimTextRef.current = '';
+      setInputDescription(updatedBase);
+    } else {
+      // Just update the interim display buffer
+      interimTextRef.current = transcript;
+      const combined = (baseTextRef.current.trim() + ' ' + transcript.trim()).trim();
+      setInputDescription(combined);
+    }
+  }, []);
 
   const { isListening, startListening, stopListening, error: speechError } = useSpeechRecognition(onSpeechResult);
 
   const toggleMic = useCallback(() => {
     if (isListening) {
       stopListening();
+      // Commit everything to base on manual stop
+      baseTextRef.current = inputDescription;
+      interimTextRef.current = '';
     } else {
-      setPreSpeechValue(inputDescription);
+      // Start session: treat current text as the "anchor"
+      baseTextRef.current = inputDescription;
+      interimTextRef.current = '';
       startListening();
     }
   }, [isListening, inputDescription, startListening, stopListening]);
@@ -174,7 +182,8 @@ const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
       images: [], imageCount: 0, timestamp: '', reportId: ''
     });
     setInputDescription('');
-    setPreSpeechValue('');
+    baseTextRef.current = '';
+    interimTextRef.current = '';
     setShowSuccessModal(false);
     addBotMessage("Hello! Let's start a new report. What type of concern are you reporting?");
   };
@@ -184,8 +193,8 @@ const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
       {/* Immersive Header */}
       <header className="bg-secondary px-6 py-4 flex items-center justify-between shadow-lg z-20 shrink-0">
         <div className="flex items-center space-x-3">
-          <div className="bg-primary p-2.5 rounded-xl shadow-inner">
-            <ShieldAlert className="text-white" size={24} />
+          <div className="bg-primary p-2.5 rounded-xl shadow-inner text-white">
+            <ShieldAlert size={24} />
           </div>
           <div>
             <h1 className="text-white font-extrabold text-lg leading-none tracking-tight">Safety Report</h1>
@@ -198,7 +207,7 @@ const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
         </div>
       </header>
 
-      {/* Main Content Area - Constrained on desktop, full on mobile */}
+      {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-h-0 bg-gray-50 items-center overflow-hidden">
         <div className="w-full max-w-2xl h-full flex flex-col relative">
           
@@ -225,7 +234,7 @@ const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
                   value={inputDescription}
                   onChange={(val) => {
                     setInputDescription(val);
-                    if (!isListening) setPreSpeechValue(val);
+                    if (!isListening) baseTextRef.current = val;
                   }}
                   onSubmit={handleDescriptionSubmit}
                   isListening={isListening}
@@ -247,7 +256,7 @@ const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
             </div>
           </div>
 
-          {/* Contextual Helper Bar (Desktop only or conditional) */}
+          {/* Contextual Helper Bar (Desktop only) */}
           <div className="px-6 py-2 bg-white/60 backdrop-blur-sm border-t border-gray-200 hidden md:flex items-center space-x-2 shrink-0">
             <Info size={14} className="text-secondary opacity-40" />
             <p className="text-[10px] text-secondary/40 font-bold uppercase tracking-tight">

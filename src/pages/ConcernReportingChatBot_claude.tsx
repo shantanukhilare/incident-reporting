@@ -346,11 +346,11 @@ const ConcernReportingChatBot_claude: React.FC = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-teal-50 to-green-50 p-4">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-[600px]">
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-teal-50 to-green-50 p-4">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col h-150">
         {/* Header */}
         <div
-          className="bg-gradient-to-r from-teal-700 to-teal-800 text-white p-6"
+          className="bg-linear-to-r from-teal-700 to-teal-800 text-white p-6"
           style={{ background: "linear-gradient(to right, #254C5A, #1a3840)" }}
         >
           <h1 className="text-2xl font-bold">Concern Reporting Chatbot</h1>
@@ -363,7 +363,7 @@ const ConcernReportingChatBot_claude: React.FC = () => {
         {showPermissionAlert && (
           <div className="bg-amber-50 border-l-4 border-amber-500 p-4 m-4 rounded-lg">
             <div className="flex items-start">
-              <div className="flex-shrink-0">
+              <div className="shrink-0">
                 <Mic className="h-5 w-5 text-amber-500" />
               </div>
               <div className="ml-3 flex-1">
