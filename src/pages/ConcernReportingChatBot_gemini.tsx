@@ -20,7 +20,7 @@ import {
 import { ShieldAlert, Info } from 'lucide-react';
 
 const ConcernReportingChatBot_gemini: React.FC = () => {
-  // State
+  // States
   const [messages, setMessages] = useState<Message[]>([
     {
         id: 'initial-message',
