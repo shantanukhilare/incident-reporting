@@ -43,9 +43,8 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [inputDescription, setInputDescription] = useState('');
   
-  // Buffers for speech to prevent jumping text
-  const baseTextRef = useRef('');
-  const interimTextRef = useRef('');
+  // Track what was in the text box BEFORE the current mic session started
+  const [textBeforeSpeech, setTextBeforeSpeech] = useState('');
 
   // Refs
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -58,33 +57,31 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
   }, [messages, currentStep]);
 
   // Speech Recognition Result Handler
-  const onSpeechResult = useCallback((transcript: string, isFinal: boolean) => {
-    if (isFinal) {
-      // Append finalized text to the base buffer and clear interim
-      const updatedBase = (baseTextRef.current.trim() + ' ' + transcript.trim()).trim();
-      baseTextRef.current = updatedBase;
-      interimTextRef.current = '';
-      setInputDescription(updatedBase);
-    } else {
-      // Just update the interim display buffer
-      interimTextRef.current = transcript;
-      const combined = (baseTextRef.current.trim() + ' ' + transcript.trim()).trim();
-      setInputDescription(combined);
+  const onSpeechResult = useCallback((sessionTranscript: string) => {
+    // Current input is strictly: (Initial Content) + (Everything said this session)
+    // By re-assembling from the anchor, we prevent cumulative repetitions.
+    const base = textBeforeSpeech.trim();
+    const voice = sessionTranscript.trim();
+    
+    if (!voice) {
+      setInputDescription(base);
+      return;
     }
-  }, []);
+    
+    const result = base ? `${base} ${voice}` : voice;
+    setInputDescription(result);
+  }, [textBeforeSpeech]);
 
   const { isListening, startListening, stopListening, error: speechError } = useSpeechRecognition(onSpeechResult);
 
   const toggleMic = useCallback(() => {
     if (isListening) {
       stopListening();
-      // Commit everything to base on manual stop
-      baseTextRef.current = inputDescription;
-      interimTextRef.current = '';
+      // On stop, the inputDescription is now the "base" for the next session
+      setTextBeforeSpeech(inputDescription);
     } else {
       // Start session: treat current text as the "anchor"
-      baseTextRef.current = inputDescription;
-      interimTextRef.current = '';
+      setTextBeforeSpeech(inputDescription);
       startListening();
     }
   }, [isListening, inputDescription, startListening, stopListening]);
@@ -182,8 +179,7 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
       images: [], imageCount: 0, timestamp: '', reportId: ''
     });
     setInputDescription('');
-    baseTextRef.current = '';
-    interimTextRef.current = '';
+    setTextBeforeSpeech('');
     setShowSuccessModal(false);
     addBotMessage("Hello! Let's start a new report. What type of concern are you reporting?");
   };
@@ -234,7 +230,7 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
                   value={inputDescription}
                   onChange={(val) => {
                     setInputDescription(val);
-                    if (!isListening) baseTextRef.current = val;
+                    if (!isListening) setTextBeforeSpeech(val);
                   }}
                   onSubmit={handleDescriptionSubmit}
                   isListening={isListening}
@@ -256,7 +252,7 @@ const ConcernReportingChatBot_gemini: React.FC = () => {
             </div>
           </div>
 
-          {/* Contextual Helper Bar (Desktop only) */}
+          {/* Contextual Helper Bar */}
           <div className="px-6 py-2 bg-white/60 backdrop-blur-sm border-t border-gray-200 hidden md:flex items-center space-x-2 shrink-0">
             <Info size={14} className="text-secondary opacity-40" />
             <p className="text-[10px] text-secondary/40 font-bold uppercase tracking-tight">

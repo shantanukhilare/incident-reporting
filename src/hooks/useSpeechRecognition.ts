@@ -1,3 +1,4 @@
+
 import { useState, useCallback, useEffect, useRef } from 'react';
 
 export interface SpeechRecognitionError {
@@ -5,19 +6,25 @@ export interface SpeechRecognitionError {
   message: string;
 }
 
-export const useSpeechRecognition = (onResult: (transcript: string, isFinal: boolean) => void) => {
+export const useSpeechRecognition = (onResult: (transcript: string) => void) => {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<SpeechRecognitionError | null>(null);
   
   const recognitionRef = useRef<any>(null);
   const isManuallyStopped = useRef(true);
   const restartTimeoutRef = useRef<number | null>(null);
+  
+  // Store callback in a ref to prevent SpeechRecognition re-initialization 
+  // when the parent component re-renders.
+  const onResultRef = useRef(onResult);
+  useEffect(() => {
+    onResultRef.current = onResult;
+  }, [onResult]);
 
   const initRecognition = useCallback(() => {
     const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     
     if (!SpeechRecognition) {
-      // Use queueMicrotask to avoid synchronous setState during initialization/effects
       queueMicrotask(() => {
         setError({ 
           error: 'not-supported', 
@@ -79,26 +86,24 @@ export const useSpeechRecognition = (onResult: (transcript: string, isFinal: boo
     };
 
     recognition.onresult = (event: any) => {
-      let interimTranscript = '';
-      let finalTranscript = '';
+      let fullSessionTranscript = '';
 
-      for (let i = event.resultIndex; i < event.results.length; ++i) {
-        if (event.results[i].isFinal) {
-          finalTranscript += event.results[i][0].transcript;
-        } else {
-          interimTranscript += event.results[i][0].transcript;
+      // Re-build the entire string from index 0 on every result event.
+      // This is the most reliable way to prevent word duplication/stuttering.
+      for (let i = 0; i < event.results.length; ++i) {
+        const transcriptChunk = event.results[i][0].transcript;
+        // Only add a space if this isn't the first segment and it doesn't already have one
+        if (i > 0 && !fullSessionTranscript.endsWith(' ') && !transcriptChunk.startsWith(' ')) {
+          fullSessionTranscript += ' ';
         }
+        fullSessionTranscript += transcriptChunk;
       }
 
-      if (finalTranscript) {
-        onResult(finalTranscript, true);
-      } else if (interimTranscript) {
-        onResult(interimTranscript, false);
-      }
+      onResultRef.current(fullSessionTranscript);
     };
 
     return recognition;
-  }, [onResult]);
+  }, []); // Empty deps ensures we only create the engine once
 
   useEffect(() => {
     recognitionRef.current = initRecognition();
@@ -110,7 +115,7 @@ export const useSpeechRecognition = (onResult: (transcript: string, isFinal: boo
           recognitionRef.current.stop();
         } catch (e) {
           // Ignore errors during cleanup
-          console.error('Error stopping recognition during cleanup:', e);
+          console.warn('Error stopping recognition during cleanup:', e);
         }
       }
       if (restartTimeoutRef.current) {
@@ -137,7 +142,7 @@ export const useSpeechRecognition = (onResult: (transcript: string, isFinal: boo
         recognitionRef.current.stop();
       } catch (e) {
         // Ignore errors
-        console.error('Error stopping recognition:', e);
+        console.warn('Error stopping recognition:', e);
       }
     }
     setIsListening(false);
