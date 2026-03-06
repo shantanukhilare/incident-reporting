@@ -328,7 +328,7 @@ export default function ConcernReportingForm() {
                 email: "",
               }));
             }}
-            className="w-full md:w-auto px-6 py-4 md:py-3 bg-[#254C5A] hover:bg-[#1a3a47] text-white font-bold rounded-xl transition-colors cursor-pointer text-lg md:text-base active:scale-95"
+            className="w-full md:w-auto px-6 py-4 md:py-3 bg-secondary hover:bg-[#1a3a47] text-white font-bold rounded-xl transition-colors cursor-pointer text-lg md:text-base active:scale-95"
           >
             Submit Another Report
           </button>
