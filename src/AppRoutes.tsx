@@ -4,6 +4,7 @@ import CreateConcernReport from "./pages/CreateConcernReport";
 import ConcernReportingChatBot_claude from "./pages/ConcernReportingChatBot_claude";
 import ConcernReportingChatBot_gemini from "./pages/ConcernReportingChatBot_gemini";
 import ConcernReportingChatBot_lib from "./pages/ConcernReportingChatBot_lib";
+import ConcernReportingForm from "./pages/ConcernReportingForm";
 
 const AppRoutes = () => {
   return (
@@ -16,7 +17,8 @@ const AppRoutes = () => {
         <Route path="/v1" element={<ConcernReportingChatBot_claude />} />
         <Route path="/v2" element={<ConcernReportingChatBot_gemini />} />
         <Route path="/v3" element={<ConcernReportingChatBot_lib />} />
-        <Route path="/" element={<ConcernReportingChatBot_lib />} />
+        <Route path="/v4" element={<ConcernReportingForm />} />
+        <Route path="/" element={<ConcernReportingForm />} />
       </Routes>
     </BrowserRouter>
   );
