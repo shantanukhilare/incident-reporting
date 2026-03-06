@@ -1,8 +1,24 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Upload, X, ChevronDown, CheckCircle2, Loader2 } from "lucide-react";
 import logo from "../assets/teqo_logo.png";
+import {
+  X,
+  ChevronDown,
+  CheckCircle2,
+  Loader2,
+  Camera,
+  Image as ImageIcon,
+} from "lucide-react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 // TODO: Update your imports to include the new submit function
-import { categoryDropdownOptions, severityDropdownOptions, submitConcernReport, getToken, setAuthToken } from "../services/ConcernReportService";
+import {
+  categoryDropdownOptions,
+  severityDropdownOptions,
+  submitConcernReport,
+  getToken,
+  setAuthToken,
+} from "../services/ConcernReportService";
 
 // --- Types ---
 interface ApiOption {
@@ -12,7 +28,7 @@ interface ApiOption {
 
 interface FormData {
   siteName: string;
-  siteId: number | ""; // Added siteId to match the API payload
+  siteId: number | "";
   concernType: number | "";
   description: string;
   location: string;
@@ -36,12 +52,12 @@ export default function ConcernReportingForm() {
   const [categories, setCategories] = useState<ApiOption[]>([]);
   const [severities, setSeverities] = useState<ApiOption[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isLoadingApp, setIsLoadingApp] = useState(true); // New state to hide form until token loads
+  const [isLoadingApp, setIsLoadingApp] = useState(true);
 
   // --- Form State ---
   const [formData, setFormData] = useState<FormData>({
     siteName: "20MW ES SUN POWER PVT LTD",
-    siteId: "", // This will be set from the URL code
+    siteId: "",
     concernType: "",
     description: "",
     location: "",
@@ -56,63 +72,73 @@ export default function ConcernReportingForm() {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   // --- Data Fetching & Auth ---
   useEffect(() => {
     const initializeApp = async () => {
       try {
-        // 1. Extract the 'name' code from the URL (e.g., ?name=MjBNVy...)
         const queryParams = new URLSearchParams(window.location.search);
         const encodedCode = queryParams.get("name");
         const encodedSiteId = queryParams.get("id");
 
         if (encodedCode) {
-          // Decode the Base64 string to use as the Site Name
           try {
             const decodedSiteName = atob(encodedCode);
-            const decodedSiteId = atob(encodedSiteId || ""); // Decode site ID as well
-            setFormData(prev => ({ ...prev, siteName: decodedSiteName }));
+            const decodedSiteId = atob(encodedSiteId || "");
+            setFormData((prev) => ({ ...prev, siteName: decodedSiteName }));
             if (decodedSiteId) {
-              setFormData(prev => ({ ...prev, siteId: Number(decodedSiteId) }));
+              setFormData((prev) => ({
+                ...prev,
+                siteId: Number(decodedSiteId),
+              }));
             }
           } catch (e) {
             console.error("Could not decode site name", e);
           }
 
-          // Fetch the Auth Token
-          const code = 'dGVxb09TXyVDUiVfdG9rZW4qJA=='; // This should ideally come from the URL or a secure source
+          const code = "dGVxb09TXyVDUiVfdG9rZW4qJA==";
           const tokenResponse = await getToken(code);
-          
-          // Assuming your API returns a raw token string, or adjust to tokenResponse.token
-          const actualToken = typeof tokenResponse === 'string' ? tokenResponse : tokenResponse?.token;
-          
+
+          const actualToken =
+            typeof tokenResponse === "string"
+              ? tokenResponse
+              : tokenResponse?.token;
+
           if (actualToken) {
-            setAuthToken(actualToken); // Tells Axios to use this for all future calls
+            setAuthToken(actualToken);
           }
         }
 
-        // 2. Fetch Dropdowns (Now authenticated!)
         const fetchedCategories = await categoryDropdownOptions();
         const fetchedSeverities = await severityDropdownOptions();
 
-        setCategories(fetchedCategories?.length ? fetchedCategories : [
-          { id: 1, name: "UNSAFE ACT" },
-          { id: 2, name: "UNSAFE CONDITION" },
-          { id: 3, name: "SAFE ACT" }
-        ]);
-        
-        setSeverities(fetchedSeverities?.length ? fetchedSeverities : [
-          { id: 1, name: "First Aid" },
-          { id: 2, name: "MTC" },
-          { id: 4, name: "LTI" },
-          { id: 5, name: "Fatal" },
-          { id: 3, name: "RWC" }
-        ]);
+        setCategories(
+          fetchedCategories?.length
+            ? fetchedCategories
+            : [
+                { id: 1, name: "UNSAFE ACT" },
+                { id: 2, name: "UNSAFE CONDITION" },
+                { id: 3, name: "SAFE ACT" },
+              ],
+        );
 
+        setSeverities(
+          fetchedSeverities?.length
+            ? fetchedSeverities
+            : [
+                { id: 1, name: "First Aid" },
+                { id: 2, name: "MTC" },
+                { id: 4, name: "LTI" },
+                { id: 5, name: "Fatal" },
+                { id: 3, name: "RWC" },
+              ],
+        );
       } catch (error) {
         console.error("Failed to initialize app:", error);
+        toast.error("Failed to load initial data.");
       } finally {
-        setIsLoadingApp(false); // Stop loading screen
+        setIsLoadingApp(false);
       }
     };
 
@@ -120,7 +146,6 @@ export default function ConcernReportingForm() {
   }, []);
 
   // --- Helpers ---
-  // Converts an image File to a Base64 string for the API payload
   const fileToBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -132,12 +157,15 @@ export default function ConcernReportingForm() {
 
   // --- Handlers ---
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >,
   ) => {
     const { name, value } = e.target;
-    const parsedValue = name === "severity" && value !== "" ? Number(value) : value;
+    const parsedValue =
+      name === "severity" && value !== "" ? Number(value) : value;
     setFormData((prev) => ({ ...prev, [name]: parsedValue }));
-    
+
     if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
@@ -152,10 +180,13 @@ export default function ConcernReportingForm() {
     const newFiles = Array.from(e.target.files);
     const validPhotos: PhotoPreview[] = [];
     let errorMessage = "";
+    let hasWarning = false;
 
     newFiles.forEach((file) => {
       if (file.size > 3 * 1024 * 1024) {
         errorMessage = "Some files exceed the 3MB limit.";
+        if (!hasWarning) toast.error(errorMessage);
+        hasWarning = true;
       } else if (validPhotos.length + photos.length < 3) {
         validPhotos.push({
           file,
@@ -163,7 +194,12 @@ export default function ConcernReportingForm() {
         });
       } else {
         errorMessage = "Maximum 3 photos allowed.";
+        if (!hasWarning) toast.warning(errorMessage);
+        hasWarning = true;
       }
+
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      if (cameraInputRef.current) cameraInputRef.current.value = "";
     });
 
     if (errorMessage) {
@@ -173,7 +209,6 @@ export default function ConcernReportingForm() {
     }
 
     setPhotos((prev) => [...prev, ...validPhotos].slice(0, 3));
-    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const removePhoto = (indexToRemove: number) => {
@@ -188,13 +223,24 @@ export default function ConcernReportingForm() {
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
     if (!formData.siteName.trim()) newErrors.siteName = "Site Name is required";
-    if (formData.concernType === "") newErrors.concernType = "Please select a type of concern";
-    if (!formData.description.trim()) newErrors.description = "Description is required";
-    if (formData.severity === "") newErrors.severity = "Severity Level is required";
+    if (formData.concernType === "")
+      newErrors.concernType = "Please select a type of concern";
+    if (!formData.description.trim())
+      newErrors.description = "Description is required";
+    if (formData.severity === "")
+      newErrors.severity = "Severity Level is required";
     if (!formData.date) newErrors.date = "Date is required";
 
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+
+    if (Object.keys(newErrors).length > 0) {
+      toast.error("Please fill in all required fields.");
+      // Auto-scroll to top so user sees the errors
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      return false;
+    }
+
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -204,40 +250,37 @@ export default function ConcernReportingForm() {
     setIsSubmitting(true);
 
     try {
-      // 1. Convert all photos to Base64
-      const base64Photos = await Promise.all(photos.map(p => fileToBase64(p.file)));
-      
-      // 2. Find the string name for the selected category
-      const selectedCategoryName = categories.find(c => c.id === formData.concernType)?.name || "";
+      const base64Photos = await Promise.all(
+        photos.map((p) => fileToBase64(p.file)),
+      );
 
-      // 3. Build the exact payload required by the API
+      const selectedCategoryName =
+        categories.find((c) => c.id === formData.concernType)?.name || "";
+
       const apiPayload = {
-        siteid: Number(formData.siteId), // Hardcoded per your payload example
+        siteid: Number(formData.siteId),
         concerntype: selectedCategoryName,
         reportername: formData.name,
         repoteremail: formData.email,
-        reporteddate: new Date(formData.date).toISOString(), // Converts to '2026-03-06T...'
+        reporteddate: new Date(formData.date).toISOString(),
         concerndescription: formData.description,
         location: formData.location,
         seviertyid: Number(formData.severity),
         categoryid: Number(formData.concernType),
-        statusid: 1, // Hardcoded per your payload example
+        statusid: 1,
         concernReportingPhotos1: base64Photos[0] || "",
         concernReportingPhotos2: base64Photos[1] || "",
-        concernReportingPhotos3: base64Photos[2] || ""
+        concernReportingPhotos3: base64Photos[2] || "",
       };
 
-      console.log("Sending Payload:", apiPayload);
-
-      // 4. Send to backend
       await submitConcernReport(apiPayload);
-      
-      // 5. Show Success Screen
-      setIsSubmitted(true);
 
+      toast.success("Report submitted successfully!");
+      setIsSubmitted(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (error) {
       console.error("Submission failed", error);
-      alert("Failed to submit the report. Please try again."); // Simple fallback error message
+      toast.error("Failed to submit the report. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -245,10 +288,11 @@ export default function ConcernReportingForm() {
 
   if (isLoadingApp) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="w-12 h-12 text-[#8bbb04] animate-spin" />
-          <p className="text-gray-600 font-medium">Loading form details...</p>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+        <ToastContainer position="top-center" autoClose={3000} hideProgressBar={true} />
+        <div className="flex flex-col items-center gap-4 bg-white p-8 rounded-2xl shadow-lg">
+          <Loader2 className="w-10 h-10 text-[#8bbb04] animate-spin" />
+          <p className="text-gray-600 font-medium text-center">Loading form details...</p>
         </div>
       </div>
     );
@@ -257,13 +301,17 @@ export default function ConcernReportingForm() {
   // --- Success View ---
   if (isSubmitted) {
     return (
-      <div className="min-h-screen bg-gray-100 py-12 px-4">
-        <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl overflow-hidden text-center p-12 mx-auto relative">
+      <div className="min-h-screen bg-gray-100 py-6 px-4 md:py-12 flex items-center justify-center">
+        <ToastContainer position="top-center" autoClose={3000} hideProgressBar={true} />
+        <div className="max-w-xl w-full bg-white rounded-2xl shadow-xl overflow-hidden text-center p-8 md:p-12 relative">
           <div className="h-2 w-full bg-[#8bbb04] absolute top-0 left-0" />
           <CheckCircle2 className="w-20 h-20 text-[#8bbb04] mx-auto mb-6" />
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Report Submitted</h2>
-          <p className="text-gray-600 mb-8">
-            Thank you for reporting this concern. Your vigilance helps keep our sites safe.
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">
+            Report Submitted
+          </h2>
+          <p className="text-gray-600 mb-8 text-sm md:text-base">
+            Thank you for reporting this concern. Your vigilance helps keep our
+            sites safe.
           </p>
           <button
             onClick={() => {
@@ -280,7 +328,7 @@ export default function ConcernReportingForm() {
                 email: "",
               }));
             }}
-            className="px-6 py-3 bg-[#254C5A] hover:bg-[#1a3a47] text-white font-bold rounded-xl transition-colors cursor-pointer"
+            className="w-full md:w-auto px-6 py-4 md:py-3 bg-[#254C5A] hover:bg-[#1a3a47] text-white font-bold rounded-xl transition-colors cursor-pointer text-lg md:text-base active:scale-95"
           >
             Submit Another Report
           </button>
@@ -291,25 +339,28 @@ export default function ConcernReportingForm() {
 
   // --- Form View ---
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4">
-      <div className="max-w-4xl w-full mx-auto bg-white rounded-2xl shadow-xl relative overflow-hidden">
+    <div className="min-h-screen bg-gray-100 py-4 px-2 md:py-12 md:px-4 flex flex-col items-center">
+      <ToastContainer position="top-center" autoClose={3000} hideProgressBar={true} />
+      
+      <div className="max-w-4xl w-full bg-white rounded-2xl shadow-xl relative overflow-hidden mb-8">
         {/* Top Accent Stripe */}
         <div className="h-2 w-full bg-[#8bbb04]" />
 
-        {/* Header & Logo */}
-        <div className="pt-8 pb-6 px-8 text-center flex justify-between items-center gap-4">
-          <img className="h-20" src={logo} alt="Logo" />
-          <h2 className="text-3xl font-bold text-secondary">Concern Reporting</h2>
+        {/* Header & Logo - Adjusted for mobile scale */}
+        <div className="pt-6 pb-4 px-4 md:pt-8 md:pb-6 md:px-8 flex items-center justify-between gap-3">
+          <img className="h-12 md:h-20 object-contain" src={logo} alt="Logo" />
+          <h2 className="text-xl md:text-3xl font-bold text-secondary text-right leading-tight">
+            Concern<br className="md:hidden"/> Reporting
+          </h2>
         </div>
 
-        <hr className="border-gray-200" />
+        <hr className="border-gray-100" />
 
-        {/* Form Body */}
-        <form onSubmit={handleSubmit} className="p-8 space-y-6">
-          
+        {/* Form Body - Tighter padding on mobile */}
+        <form onSubmit={handleSubmit} className="p-4 md:p-8 space-y-5 md:space-y-6">
           {/* 1. Site Name */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Site Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -318,9 +369,11 @@ export default function ConcernReportingForm() {
               readOnly
               value={formData.siteName}
               onChange={handleInputChange}
-              className={`w-full bg-gray-50 border ${errors.siteName ? "border-red-500" : "border-gray-200"} rounded-lg px-4 py-3 outline-none text-secondary ring-2 ring-[#8bbb04] border-transparent transition-all`}
+              className={`w-full bg-gray-50 border ${errors.siteName ? "border-red-500" : "border-gray-200"} rounded-xl px-4 py-3 md:py-3.5 outline-none text-base text-secondary ring-2 ring-[#8bbb04] border-transparent transition-all`}
             />
-            {errors.siteName && <p className="text-red-500 text-sm mt-1">{errors.siteName}</p>}
+            {errors.siteName && (
+              <p className="text-red-500 text-sm mt-1">{errors.siteName}</p>
+            )}
           </div>
 
           {/* 2. Type of Concern */}
@@ -328,13 +381,14 @@ export default function ConcernReportingForm() {
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Type of Concern <span className="text-red-500">*</span>
             </label>
-            <div className="flex flex-wrap gap-3">
+            {/* Switched to a grid on mobile to prevent awkward wrapping */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 md:gap-3">
               {categories.map((cat) => (
                 <button
                   key={cat.id}
                   type="button"
                   onClick={() => handleTypeToggle(cat.id)}
-                  className={`flex-1 min-w-[120px] cursor-pointer py-2.5 px-4 rounded-full text-sm font-bold transition-all border ${
+                  className={`w-full cursor-pointer py-3 md:py-3.5 px-3 rounded-xl text-sm md:text-base font-bold transition-all border active:scale-95 ${
                     formData.concernType === cat.id
                       ? "bg-[#254C5A] border-[#254C5A] text-white shadow-md"
                       : "bg-white border-gray-300 text-gray-600 hover:border-[#8bbb04] hover:text-[#8bbb04]"
@@ -344,12 +398,14 @@ export default function ConcernReportingForm() {
                 </button>
               ))}
             </div>
-            {errors.concernType && <p className="text-red-500 text-sm mt-1">{errors.concernType}</p>}
+            {errors.concernType && (
+              <p className="text-red-500 text-sm mt-1">{errors.concernType}</p>
+            )}
           </div>
 
           {/* 3. Concern Description */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Concern Description <span className="text-red-500">*</span>
             </label>
             <textarea
@@ -357,31 +413,34 @@ export default function ConcernReportingForm() {
               value={formData.description}
               onChange={handleInputChange}
               rows={4}
-              placeholder="Enter Description"
-              className={`w-full bg-gray-50 border ${errors.description ? "border-red-500" : "border-gray-200"} rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all resize-y`}
+              placeholder="Enter details of the concern..."
+              className={`w-full bg-gray-50 border ${errors.description ? "border-red-500" : "border-gray-200"} rounded-xl px-4 py-3 md:py-3.5 outline-none text-base focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all resize-y`}
             />
-            {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
           </div>
 
           {/* Row: Location Details & Severity Level */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
             {/* 4. Location Details */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Location Details</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Location Details
+              </label>
               <input
                 type="text"
                 name="location"
                 value={formData.location}
                 onChange={handleInputChange}
-                placeholder="Enter location details"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all"
+                placeholder="Where did this happen?"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-3.5 outline-none text-base focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all"
               />
             </div>
 
             {/* 5. Severity Level */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
                 Severity Level <span className="text-red-500">*</span>
               </label>
               <div className="relative">
@@ -389,9 +448,11 @@ export default function ConcernReportingForm() {
                   name="severity"
                   value={formData.severity}
                   onChange={handleInputChange}
-                  className={`w-full appearance-none bg-gray-50 border ${errors.severity ? "border-red-500" : "border-gray-200"} rounded-lg px-4 py-3 pr-10 outline-none focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all cursor-pointer`}
+                  className={`w-full appearance-none bg-gray-50 border ${errors.severity ? "border-red-500" : "border-gray-200"} rounded-xl px-4 py-3 md:py-3.5 pr-10 outline-none text-base focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all cursor-pointer`}
                 >
-                  <option value="" disabled>Select Severity Level</option>
+                  <option value="" disabled>
+                    Select Severity
+                  </option>
                   {severities.map((sev) => (
                     <option key={sev.id} value={sev.id}>
                       {sev.name}
@@ -400,44 +461,81 @@ export default function ConcernReportingForm() {
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5 pointer-events-none" />
               </div>
-              {errors.severity && <p className="text-red-500 text-sm mt-1">{errors.severity}</p>}
+              {errors.severity && (
+                <p className="text-red-500 text-sm mt-1">{errors.severity}</p>
+              )}
             </div>
-
           </div>
 
           {/* 6. Upload Photos */}
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">Upload Photos</label>
-            <div
-              onClick={() => fileInputRef.current?.click()}
-              className="w-full border-2 border-dashed border-gray-300 rounded-lg p-6 flex flex-col items-center justify-center cursor-pointer hover:border-[#8bbb04] hover:bg-gray-50 transition-all"
-            >
-              <Upload className="w-8 h-8 text-gray-400 mb-2" />
-              <span className="text-sm font-medium text-gray-600">JPG, JPEG, PNG</span>
-              <span className="text-xs text-gray-400 mt-1">Max 3 files (Under 3MB each)</span>
-              <input
-                type="file"
-                ref={fileInputRef}
-                onChange={handlePhotoUpload}
-                accept="image/jpeg, image/png, image/jpg"
-                multiple
-                className="hidden"
-              />
+          <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
+            <label className="block text-sm font-semibold text-gray-700 mb-2">
+              Upload Photos 
+              <span className="block sm:inline text-gray-500 font-normal text-xs sm:ml-2 mt-0.5 sm:mt-0">
+                (Max 3 files, under 3MB each)
+              </span>
+            </label>
+            
+            {/* Hidden file inputs */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handlePhotoUpload}
+              accept="image/jpeg, image/png, image/jpg"
+              multiple
+              className="hidden"
+            />
+            <input
+              type="file"
+              ref={cameraInputRef}
+              onChange={handlePhotoUpload}
+              accept="image/jpeg, image/png, image/jpg"
+              capture="environment" 
+              multiple
+              className="hidden"
+            />
+
+            {/* Upload Buttons */}
+            <div className="grid grid-cols-2 gap-3 mt-1">
+              <button
+                type="button"
+                onClick={() => cameraInputRef.current?.click()}
+                className="flex flex-col sm:flex-row items-center justify-center gap-2 bg-white text-gray-800 px-2 py-3 md:py-4 rounded-xl hover:text-white transition-all duration-200 font-medium text-sm cursor-pointer group shadow-sm active:scale-95"
+                style={{ border: "2px solid #8bbb04" }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#8bbb04"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "white"; }}
+              >
+                <Camera size={22} className="text-[#8bbb04] group-hover:text-white transition-colors" />
+                <span>Take Photo</span>
+              </button>
+              
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex flex-col sm:flex-row items-center justify-center gap-2 bg-white text-gray-800 px-2 py-3 md:py-4 rounded-xl hover:text-white transition-all duration-200 font-medium text-sm cursor-pointer group shadow-sm active:scale-95"
+                style={{ border: "2px solid #8bbb04" }}
+                onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = "#8bbb04"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = "white"; }}
+              >
+                <ImageIcon size={22} className="text-[#8bbb04] group-hover:text-white transition-colors" />
+                <span>Gallery</span>
+              </button>
             </div>
-            {errors.photos && <p className="text-red-500 text-sm mt-1">{errors.photos}</p>}
+            
+            {errors.photos && <p className="text-red-500 text-sm mt-2 font-medium">{errors.photos}</p>}
 
             {/* Thumbnails */}
             {photos.length > 0 && (
-              <div className="flex gap-4 mt-4">
+              <div className="grid grid-cols-3 gap-3 mt-4">
                 {photos.map((photo, index) => (
-                  <div key={index} className="relative w-20 h-20 rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                  <div key={index} className="relative aspect-square rounded-lg overflow-hidden border-2 border-gray-200 shadow-sm group">
                     <img src={photo.previewUrl} alt="Preview" className="w-full h-full object-cover" />
                     <button
                       type="button"
                       onClick={() => removePhoto(index)}
-                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors cursor-pointer"
+                      className="absolute top-1 right-1 bg-red-600/90 text-white rounded-full p-1.5 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity duration-200 shadow-md cursor-pointer hover:bg-red-700 active:scale-90"
                     >
-                      <X className="w-3 h-3" />
+                      <X size={14} />
                     </button>
                   </div>
                 ))}
@@ -447,7 +545,7 @@ export default function ConcernReportingForm() {
 
           {/* 7. Date of Concern */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1">
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Date of Concern <span className="text-red-500">*</span>
             </label>
             <input
@@ -455,52 +553,60 @@ export default function ConcernReportingForm() {
               name="date"
               value={formData.date}
               onChange={handleInputChange}
-              className={`w-full bg-gray-50 border ${errors.date ? "border-red-500" : "border-gray-200"} rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all cursor-pointer`}
+              className={`w-full bg-gray-50 border ${errors.date ? "border-red-500" : "border-gray-200"} rounded-xl px-4 py-3 md:py-3.5 outline-none text-base focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all cursor-pointer`}
             />
-            {errors.date && <p className="text-red-500 text-sm mt-1">{errors.date}</p>}
+            {errors.date && (
+              <p className="text-red-500 text-sm mt-1">{errors.date}</p>
+            )}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 md:gap-6">
             {/* 8. Your Name */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Your Name</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Your Name <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+              </label>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
                 onChange={handleInputChange}
                 placeholder="Enter your name"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-3.5 outline-none text-base focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all"
               />
             </div>
 
             {/* 9. Email Address */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Email Address</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+                Email Address <span className="text-gray-400 font-normal text-xs">(Optional)</span>
+              </label>
               <input
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleInputChange}
-                placeholder="Enter email address"
-                className="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all"
+                placeholder="Enter your email"
+                className="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 md:py-3.5 outline-none text-base focus:ring-2 focus:ring-[#8bbb04] focus:border-transparent transition-all"
               />
             </div>
           </div>
 
           {/* Submit Button */}
-          <div className="pt-4">
+          <div className="pt-4 pb-2">
             <button
               type="submit"
               disabled={isSubmitting}
-              className={`w-full py-4 bg-[#254C5A] text-white font-bold text-lg rounded-xl transition-colors shadow-lg shadow-gray-200/50 outline-none focus:ring-4 focus:ring-[#8bbb04]/30 flex items-center justify-center gap-2 ${
-                isSubmitting ? "opacity-75 cursor-not-allowed" : "hover:bg-[#1a3a47] cursor-pointer"
+              className={`w-full py-4 bg-[#254C5A] text-white font-bold text-lg rounded-xl transition-all shadow-lg shadow-[#254C5A]/30 outline-none focus:ring-4 focus:ring-[#8bbb04]/40 flex items-center justify-center gap-2 active:scale-[0.98] ${
+                isSubmitting
+                  ? "opacity-80 cursor-not-allowed"
+                  : "hover:bg-[#1a3a47] cursor-pointer hover:shadow-xl"
               }`}
             >
               {isSubmitting ? (
                 <>
                   <Loader2 className="w-6 h-6 animate-spin" />
-                  Submitting...
+                  Submitting Report...
                 </>
               ) : (
                 "Submit Report"
